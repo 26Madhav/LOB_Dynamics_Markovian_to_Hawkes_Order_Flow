@@ -1,0 +1,45 @@
+=================================================================
+HAWKES LOB — ANALYSIS REPORT
+=================================================================
+
+FINDING A — Branching ratios (η = α/β)
+----------------------------------------
+
+  R1:
+    sell_submit      η=0.05129  μ(d=1)=0.1014 ev/s
+    buy_submit       η=0.06963  μ(d=1)=0.1273 ev/s
+    sell_cancel      η=0.02007  μ(d=1)=0.1063 ev/s
+    buy_cancel       η=0.04334  μ(d=1)=0.1251 ev/s
+
+  R2:
+    sell_submit      η=0.00047  μ(d=1)=0.0164 ev/s
+    buy_submit       η=0.00136  μ(d=1)=0.0166 ev/s
+    sell_cancel      η=0.00061  μ(d=1)=0.0155 ev/s
+    buy_cancel       η=0.00170  μ(d=1)=0.0167 ev/s
+
+  Interpretation: η << 1 for all streams → subcritical Hawkes.
+  Self-excitation is present but decays quickly (large β).
+
+FINDING B — Depth monotonicity of cancel rates
+----------------------------------------
+
+  R1:
+    sell_cancel      rates=[0.1063 0.0908 0.0729 0.0365 0.0365 0.0206]  monotone=True
+    buy_cancel       rates=[0.1251 0.0954 0.071  0.0358 0.0358 0.0205]  monotone=True
+
+  R2:
+    sell_cancel      rates=[0.0155 0.011  0.0083 0.0078 0.0078 0.0047]  monotone=True
+    buy_cancel       rates=[0.0167 0.0127 0.0077 0.0074 0.0074 0.0054]  monotone=True
+
+FINDING C — Three-way surface comparison
+----------------------------------------
+
+  R1  (9 interior cells with empirical data):
+    KBE vs empirical:  MAE=0.3045  corr=0.8394
+    MC  vs empirical:  MAE=0.3595  corr=0.8648
+    Gap closure:       -18.1%  (KBE→MC)
+    KBE-MC agreement:  MAE=0.0736
+
+  R2: empirical data not available
+
+=================================================================

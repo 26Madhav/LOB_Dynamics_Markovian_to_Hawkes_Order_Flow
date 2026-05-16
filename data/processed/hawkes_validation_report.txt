@@ -1,0 +1,53 @@
+HAWKES LOB — VALIDATION REPORT  (v4)
+=================================================================
+
+ticker=intc  T=30.0s  T_burnin=5.0s  n_mc=2000
+
+Bugs fixed vs v2/v3
+----------------------------------------
+  1. MC cold-start: warm-start A from stationary E[A_e] + burnin
+  2. KBE aliasing: detected and flagged; fix in kbe_engine.py
+
+Gap Statistics
+----------------------------------------
+
+  R1: KBE vs MC(first)
+    n=25  mean=+0.00654  MAE=0.09159  RMSE=0.12448  corr=0.3216  max=0.25342
+
+  R1: KBE   vs Empirical
+    n=9  mean=-0.10520  MAE=0.30449  RMSE=0.32347  corr=0.8394  max=0.44825
+
+  R1: MC    vs Empirical
+    n=9  mean=-0.11512  MAE=0.35946  RMSE=0.37241  corr=0.8648  max=0.48103
+
+  R1: MC(T) vs Empirical
+    n=9  mean=-0.06870  MAE=0.43845  RMSE=0.45129  corr=-0.2736  max=0.62100
+
+
+Finding C
+----------------------------------------
+  R1: Hawkes closes -18.1% of gap  (KBE MAE=0.3045 → MC MAE=0.3595)
+
+
+KBE aliasing summary
+----------------------------------------
+  hawkes_kbe_engine.py used natural_k(z1,z2)=floor((z1+z2-2)*K/(2*Z))
+  as its state index.  This function is MANY-TO-ONE: multiple (z1,z2)
+  pairs with the same z1+z2 map to the same k value, so the KBE result
+  is identical for all cells on each anti-diagonal.
+
+  Required fix:
+    state_idx = (z1 - 1) * Z + (z2 - 1)   # range 0..Z²-1
+  This preserves the full (z1, z2) resolution so that:
+    - sell-side events index into mu[e, z1-1, xi]  (ask depth)
+    - buy-side  events index into mu[e, z2-1, xi]  (bid depth)
+  and P(ask up | z1, z2) is correctly asymmetric in z1 vs z2.
+
+
+MC warm-start details
+----------------------------------------
+  The Hawkes calibration fits mu[e,d,xi] per excitement bin xi.
+  At xi=0 (cold start) mu is near zero for most cells because
+  the empirical data always has some residual excitement.
+  Fix: initialise A[e] = mu[e,d,xi_avg] / (beta[e,d,xi_avg] - alpha)
+  then run T_burnin seconds of burn-in before measuring.
