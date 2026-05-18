@@ -8,4 +8,3 @@ pyarrow
 nbformat
 nbclient
 jupyter
-
